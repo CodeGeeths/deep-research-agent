@@ -21,7 +21,7 @@ class ResearchManager:
         the final report out of the `write_report` tool's output.
         """
         trace_id = gen_trace_id()
-        with trace("Research trace", trace_id=trace_id):
+        with trace("Research trace", trace_id=trace_id, metadata={"query": query}):
             yield f"Starting research. Trace: https://platform.openai.com/traces/trace?trace_id={trace_id}"
 
             report: ReportData | None = None
