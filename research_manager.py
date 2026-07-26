@@ -1,4 +1,4 @@
-from agents import Runner, gen_trace_id, trace
+from agents import OutputGuardrailTripwireTriggered, Runner, gen_trace_id, trace
 
 from orchestrator_agent import orchestrator_agent
 from writer_agent import ReportData
@@ -26,15 +26,22 @@ class ResearchManager:
 
             report: ReportData | None = None
             result = Runner.run_streamed(orchestrator_agent, query)
-            async for event in result.stream_events():
-                if event.type != "run_item_stream_event":
-                    continue
+            try:
+                async for event in result.stream_events():
+                    if event.type != "run_item_stream_event":
+                        continue
 
-                if event.name == "tool_called":
-                    tool_name = event.item.tool_name
-                    yield STATUS_MESSAGES.get(tool_name, f"Calling {tool_name}...")
-                elif event.name == "tool_output" and isinstance(event.item.output, ReportData):
-                    report = event.item.output
+                    if event.name == "tool_called":
+                        tool_name = event.item.tool_name
+                        yield STATUS_MESSAGES.get(tool_name, f"Calling {tool_name}...")
+                    elif event.name == "tool_output" and isinstance(event.item.output, ReportData):
+                        report = event.item.output
+            except OutputGuardrailTripwireTriggered:
+                yield (
+                    "The drafted report was blocked by the content safety guardrail and could "
+                    "not be delivered. Try rephrasing your query."
+                )
+                return
 
             if report is None:
                 raise RuntimeError("Orchestrator finished without producing a report")

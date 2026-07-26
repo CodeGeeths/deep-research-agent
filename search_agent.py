@@ -6,6 +6,10 @@ INSTRUCTIONS = """
 You are a research assistant. Given a search term, you search the web for that term and
 produce a concise summary of the results. The summary must be 2-3 paragraphs and less than 300 words.
 Capture the main points and be succinct. Reply only with the summary.
+
+After the summary, add a "Sources:" section listing the URLs of the pages you actually drew
+information from, as markdown links, e.g. "- [Page title](https://example.com)". Only include
+links you used; do not fabricate URLs.
 """
 
 search_agent = Agent(

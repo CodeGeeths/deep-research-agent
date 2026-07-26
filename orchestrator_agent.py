@@ -47,6 +47,9 @@ orchestrator_agent = Agent(
                 "Given the original query and the collected search summaries, write the final "
                 "long-form markdown research report."
             ),
+            # Let a tripped content guardrail raise instead of being swallowed into a generic
+            # tool-error string the orchestrator might just retry past.
+            failure_error_function=None,
         ),
         notification_agent.as_tool(
             tool_name="send_notification",
